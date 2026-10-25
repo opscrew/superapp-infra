@@ -5,7 +5,7 @@ const config = new pulumi.Config();
 // The kube context is required so this program can never land on whatever context kubectl happens to point at.
 const kubeContext = config.require("kubeContext");
 const image = config.get("image") ?? "ghcr.io/your-throwaway-org/superapp:latest";
-const memoryLimit = config.get("memoryLimit") ?? "64Mi";
+const memoryLimit = config.get("memoryLimit") ?? "128Mi";
 const cpuLimit = config.get("cpuLimit") ?? "200m";
 
 const provider = new k8s.Provider("kind", { context: kubeContext });
