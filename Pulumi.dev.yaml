@@ -1,0 +1,4 @@
+config:
+  superapp-infra:kubeContext: kind-ops-crew
+  superapp-infra:image: superapp:dev
+  superapp-infra:memoryLimit: 64Mi
