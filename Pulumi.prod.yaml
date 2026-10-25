@@ -1,0 +1,6 @@
+config:
+  superapp-infra:kubeContext: kind-clu-prod
+  superapp-infra:cluster: clu-prod
+  superapp-infra:image: superapp:dev
+  superapp-infra:memoryLimit: 128Mi
+encryptionsalt: v1:7FzVrMW0APA=:v1:+9CYUXbtwQOV9Jul:cUgZycU3MvvvOIVVlCyA3ucjXQQ99A==

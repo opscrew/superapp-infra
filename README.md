@@ -11,3 +11,7 @@ pulumi up --yes
 ```
 
 Config keys: `kubeContext` (required, pins the cluster), `image`, `memoryLimit`, `cpuLimit`.
+
+## Stacks
+
+One stack per cluster: `prod` deploys to `kind-clu-prod` (cluster `clu-prod`), `dev` to `kind-clu-dev` (cluster `clu-dev`). Each stack sets `kubeContext`, `cluster`, `image` and `memoryLimit`; the program labels the namespace with `ops-crew.io/cluster`.

@@ -4,13 +4,15 @@ import * as pulumi from "@pulumi/pulumi";
 const config = new pulumi.Config();
 // The kube context is required so this program can never land on whatever context kubectl happens to point at.
 const kubeContext = config.require("kubeContext");
+// The cluster's name as Ops-Crew knows it; written onto the namespace so what runs where is visible from the cluster too.
+const cluster = config.require("cluster");
 const image = config.get("image") ?? "ghcr.io/opscrew/superapp:latest";
 const memoryLimit = config.get("memoryLimit") ?? "128Mi";
 const cpuLimit = config.get("cpuLimit") ?? "200m";
 
-const provider = new k8s.Provider("kind", { context: kubeContext });
+const provider = new k8s.Provider(cluster, { context: kubeContext });
 
-const ns = new k8s.core.v1.Namespace("superapp", { metadata: { name: "superapp" } }, { provider });
+const ns = new k8s.core.v1.Namespace("superapp", { metadata: { name: "superapp", labels: { "ops-crew.io/cluster": cluster } } }, { provider });
 
 const labels = { app: "superapp" };
 
