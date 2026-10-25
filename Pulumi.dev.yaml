@@ -1,5 +1,6 @@
 config:
   superapp-infra:kubeContext: kind-ops-crew
   superapp-infra:image: superapp:dev
-  superapp-infra:memoryLimit: 128Mi
+  # Raised from 128Mi to 192Mi after superapp was OOMKilled on 2026-10-25.
+  superapp-infra:memoryLimit: 192Mi
 encryptionsalt: v1:4YXNblrctTU=:v1:RcsdD6S9b1NsxsEx:CqR6i8/iTU0hFhOJ8XxTmraTglzdOA==
