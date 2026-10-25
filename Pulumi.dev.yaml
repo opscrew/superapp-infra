@@ -1,5 +1,5 @@
 config:
   superapp-infra:kubeContext: kind-ops-crew
   superapp-infra:image: superapp:dev
-  superapp-infra:memoryLimit: 256Mi
+  superapp-infra:memoryLimit: 192Mi
 encryptionsalt: v1:4YXNblrctTU=:v1:RcsdD6S9b1NsxsEx:CqR6i8/iTU0hFhOJ8XxTmraTglzdOA==
