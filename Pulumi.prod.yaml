@@ -1,5 +1,5 @@
 config:
-  superapp-infra:kubeContext: kind-clu-prod
+  superapp-infra:kubeContext: kind-opscrew-preview
   superapp-infra:cluster: clu-prod
   superapp-infra:image: superapp:dev
   superapp-infra:memoryLimit: 256Mi
