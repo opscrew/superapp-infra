@@ -9,6 +9,8 @@ const cluster = config.require("cluster");
 const image = config.get("image") ?? "ghcr.io/opscrew/superapp:latest";
 const memoryLimit = config.get("memoryLimit") ?? "128Mi";
 const cpuLimit = config.get("cpuLimit") ?? "200m";
+// superapp calls superapp2 on every request; this is where it finds it.
+const upstreamUrl = config.get("upstreamUrl") ?? "http://superapp2.superapp2";
 
 const provider = new k8s.Provider(cluster, { context: kubeContext });
 
@@ -31,8 +33,15 @@ const deployment = new k8s.apps.v1.Deployment(
               name: "superapp",
               image,
               imagePullPolicy: image.startsWith("ghcr.io/") ? "Always" : "IfNotPresent",
-              ports: [{ containerPort: 8080, name: "http" }],
-              env: [{ name: "APP_VERSION", value: "1.0.0" }],
+              ports: [
+                { containerPort: 8080, name: "http" },
+                { containerPort: 9464, name: "metrics" },
+              ],
+              env: [
+                { name: "APP_VERSION", value: "1.0.0" },
+                { name: "UPSTREAM_URL", value: upstreamUrl },
+                { name: "METRICS_PORT", value: "9464" },
+              ],
               resources: {
                 requests: { cpu: "50m", memory: "32Mi" },
                 limits: { cpu: cpuLimit, memory: memoryLimit },
@@ -51,9 +60,28 @@ const service = new k8s.core.v1.Service(
   "superapp",
   {
     metadata: { name: "superapp", namespace: ns.metadata.name, labels },
-    spec: { selector: labels, ports: [{ port: 80, targetPort: "http", name: "http" }] },
+    spec: {
+      selector: labels,
+      ports: [
+        { port: 80, targetPort: "http", name: "http" },
+        { port: 9464, targetPort: "metrics", name: "metrics" },
+      ],
+    },
   },
   { provider },
+);
+
+// Prometheus (the cluster's kube-prometheus-stack) scrapes superapp's OpenTelemetry metrics, such as
+// superapp_upstream_duration, from the metrics port.
+new k8s.apiextensions.CustomResource(
+  "superapp-metrics",
+  {
+    apiVersion: "monitoring.coreos.com/v1",
+    kind: "ServiceMonitor",
+    metadata: { name: "superapp", namespace: ns.metadata.name, labels },
+    spec: { selector: { matchLabels: labels }, endpoints: [{ port: "metrics", path: "/metrics", interval: "15s" }] },
+  },
+  { provider, dependsOn: [service] },
 );
 
 export const namespace = ns.metadata.name;

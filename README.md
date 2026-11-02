@@ -11,7 +11,7 @@ pulumi stack select prod --create
 pulumi up --yes --refresh
 ```
 
-Config keys: `kubeContext` (required, pins the cluster), `image`, `memoryLimit`, `cpuLimit`.
+Config keys: `kubeContext` (required, pins the cluster), `image`, `memoryLimit`, `cpuLimit` (default `200m`), `upstreamUrl` (superapp2, default `http://superapp2.superapp2`). The program also makes a ServiceMonitor, so the cluster's Prometheus scrapes superapp's OpenTelemetry metrics on port 9464.
 
 ## Stacks
 
