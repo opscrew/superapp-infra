@@ -9,4 +9,4 @@ spec:
       containers:
         - name: superapp
           resources:
-            limits: { memory: 256Mi }
+            limits: { memory: 128Mi }
