@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: superapp
+  labels: { app: superapp }
+spec:
+  selector: { app: superapp }
+  ports:
+    - { port: 80, targetPort: http, name: http }
+    - { port: 9464, targetPort: metrics, name: metrics }

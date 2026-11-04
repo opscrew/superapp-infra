@@ -1,18 +1,11 @@
 # superapp-infra
 
-Pulumi program deploying [superapp](../superapp) to Kubernetes. Sample IaC repo for Ops-Crew: the memory limit lives in `Pulumi.<stack>.yaml` and `index.ts`, which is what Ops-Crew's pull requests change.
+Kubernetes manifests deploying [superapp](../superapp), with Kustomize. Sample infrastructure repository for OpsCrew: `base/` holds what every environment shares, and `overlays/prod/` what prod sets, such as superapp's memory limit in `overlays/prod/resources.yml`, which is what OpsCrew's pull requests change.
 
 ```sh
-npm install
-export PULUMI_BACKEND_URL=file://$PWD/.pulumi   # local state; or `pulumi login` to your backend
-export PULUMI_CONFIG_PASSPHRASE=''
-export KUBECONFIG=~/.local/share/opscrew-preview/kubeconfig   # the OpsCrew preview's cluster
-pulumi stack select prod --create
-pulumi up --yes --refresh
+kubectl kustomize overlays/prod   # what prod gets
 ```
 
-Config keys: `kubeContext` (required, pins the cluster), `image`, `memoryLimit`, `cpuLimit` (default `200m`), `upstreamUrl` (superapp2, default `http://superapp2.superapp2`). The program also makes a ServiceMonitor, so the cluster's Prometheus scrapes superapp's OpenTelemetry metrics on port 9464.
+## Deploying
 
-## Stacks
-
-One stack, `prod`, deploying to the kind cluster of OpsCrew's preview environment (`deploy/preview/preview.sh` in the OpsCrew repository): context `kind-opscrew-preview` in the preview's own kubeconfig, which OpsCrew knows as the Kubernetes Cluster `clu-prod`. The stack sets `kubeContext`, `cluster`, `image` and `memoryLimit`; the program labels the namespace with `ops-crew.io/cluster`. `--refresh` matters: when the preview cluster is recreated, the local state still lists what the old one had.
+Argo CD in OpsCrew's preview environment (`deploy/preview/preview.sh` in the OpsCrew repository) syncs `overlays/prod` on `main` into the preview's kind cluster, which OpsCrew knows as the Kubernetes Cluster `clu-prod`: automatically, with prune, within a minute of a merge. Self-heal is off, so a change made in the cluster by hand stays until the next sync. The image is `superapp:dev`, built and loaded into the cluster by `preview.sh apps`.

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: superapp
+  labels: { app: superapp }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: superapp }
+  template:
+    metadata:
+      labels: { app: superapp }
+    spec:
+      containers:
+        - name: superapp
+          # Built and loaded into the preview cluster by OpsCrew's deploy/preview/preview.sh apps.
+          image: superapp:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - { containerPort: 8080, name: http }
+            - { containerPort: 9464, name: metrics }
+          env:
+            - { name: APP_VERSION, value: "1.0.0" }
+            # superapp calls superapp2 on every request; this is where it finds it.
+            - { name: UPSTREAM_URL, value: "http://superapp2.superapp2" }
+            - { name: METRICS_PORT, value: "9464" }
+          resources:
+            requests: { cpu: 50m, memory: 32Mi }
+            limits: { cpu: 200m }
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            periodSeconds: 5

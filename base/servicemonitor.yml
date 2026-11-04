@@ -1,0 +1,12 @@
+# Prometheus (the cluster's kube-prometheus-stack) scrapes superapp's OpenTelemetry metrics, such as
+# superapp_upstream_duration, from the metrics port.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: superapp
+  labels: { app: superapp }
+spec:
+  selector:
+    matchLabels: { app: superapp }
+  endpoints:
+    - { port: metrics, path: /metrics, interval: 15s }

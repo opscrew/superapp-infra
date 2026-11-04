@@ -1,0 +1,12 @@
+# superapp's memory limit in prod: the base sets none.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: superapp
+spec:
+  template:
+    spec:
+      containers:
+        - name: superapp
+          resources:
+            limits: { memory: 128Mi }
