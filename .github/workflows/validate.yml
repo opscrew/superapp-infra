@@ -1,0 +1,13 @@
+# Added by OpsCrew's deploy/acceptance/goals-and-proofs.sh: the workflow a Note names, whose run on a merge commit
+# a merged fix waits on (docs/acceptance/12-goals-and-proofs.md).
+name: validate
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: kubectl kustomize overlays/prod > /dev/null
