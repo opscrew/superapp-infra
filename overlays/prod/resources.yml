@@ -1,12 +1,18 @@
 # superapp's memory limit in prod: the base sets none.
 # superapp's replicas in prod: the base sets one. Each superapp pod sends its own share of the load to superapp2,
 # whose pods stay under NORMAL_MAX_RPS (3) only if the load is spread over several of them.
+#
+# Six replicas: superapp calls superapp2 at about 7 rps, and superapp2 sends each new call over its own connection,
+# so kube-proxy spreads them over the Ready superapp2 pods; at ~1.2 rps each pod stays well under NORMAL_MAX_RPS and
+# answers at once. With one superapp pod (the base's default) the whole 7 rps lands on a single superapp2 pod, which
+# burns a full core and queues its calls behind it: superapp then saw a p95 upstream time of ~4.85 s and timeouts, and
+# SuperappSlow fired.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: superapp
 spec:
-  replicas: 1
+  replicas: 6
   template:
     spec:
       containers:
