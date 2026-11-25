@@ -24,9 +24,10 @@ spec:
             # superapp calls superapp2 on every request; this is where it finds it.
             - { name: UPSTREAM_URL, value: "http://superapp2.superapp2" }
             - { name: METRICS_PORT, value: "9464" }
-            # How long a call to superapp2 may take before superapp gives up on it. The default is 15 s, so a
-            # saturated superapp2 was recorded (and alerted on) at seconds; its normal answers are well under 250 ms.
-            - { name: UPSTREAM_TIMEOUT_MS, value: "3000" }
+            # How long a call to superapp2 may take before superapp gives up on it. The default is 15 s. A saturated
+            # superapp2 queues calls behind its CPU burn, so its p95 was ~4.85 s: 3000 ms marked most of those calls
+            # as errors, while 10 s still bounds the wait for a hung upstream.
+            - { name: UPSTREAM_TIMEOUT_MS, value: "10000" }
           resources:
             requests: { cpu: 50m, memory: 32Mi }
             limits: { cpu: 200m }
