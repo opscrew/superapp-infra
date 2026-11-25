@@ -1,9 +1,12 @@
 # superapp's memory limit in prod: the base sets none.
+# superapp's replicas in prod: the base sets one. Each superapp pod sends its own share of the load to superapp2,
+# whose pods stay under NORMAL_MAX_RPS (3) only if the load is spread over several of them.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: superapp
 spec:
+  replicas: 3
   template:
     spec:
       containers:
