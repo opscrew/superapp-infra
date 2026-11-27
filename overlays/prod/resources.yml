@@ -1,4 +1,7 @@
 # superapp's memory limit in prod: the base sets none.
+# 512Mi: the app is a sample that hoards memory on /hog, and at 256Mi its container in clu-prod
+# was still OOMKilled (pod superapp-7d9f8b6c4-x2k9q, 3 times in 10 minutes). Doubled from 256Mi
+# to give the process headroom; requests stay at 32Mi (base), so this is still a burstable pod.
 # superapp's replicas in prod: the base sets one. Each superapp pod sends its own share of the load to superapp2,
 # whose pods stay under NORMAL_MAX_RPS (3) only if the load is spread over several of them.
 apiVersion: apps/v1
@@ -12,4 +15,4 @@ spec:
       containers:
         - name: superapp
           resources:
-            limits: { memory: 256Mi }
+            limits: { memory: 512Mi }
